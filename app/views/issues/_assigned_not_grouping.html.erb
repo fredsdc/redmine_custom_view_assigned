@@ -1,8 +1,14 @@
 <select id="issue_assigned_to_id_not_grouped" style="display: none;">
   <option value=""/>
-  <option value="<%= User.current.id %>"><< <%= l(:label_me) %> >></option>
   <% users.each do |user| %>
+    <% if user.id == User.current.id %>
+      <option value="<%= User.current.id %>"><< <%= l(:label_me) %> >></option>
+    <% end %>
+  <% end %>
+  <% users.each do |user| %>
+    <% if user.id != User.current.id %>
       <option value="<%= user.id %>"><%= user.name %></option>
+    <% end %>
   <% end %>
 </select>
 
@@ -11,6 +17,8 @@
     $(function () {
         var selectedUserId = $('#issue_assigned_to_id').val();
         $('#issue_assigned_to_id').empty().html($('#issue_assigned_to_id_not_grouped').html());
+        $('#issue_assigned_to_id').val(selectedUserId);
+        selectedUserId = $('#issue_assigned_to_id').val();
         $('#issue_assigned_to_id').val(selectedUserId);
     })
     //]]>
