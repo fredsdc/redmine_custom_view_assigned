@@ -2,16 +2,17 @@ module CustomViewAssignedHelper
   def assignable_users(issue)
     current_project = Project.find(issue.project_id)
 
-    workflow_rules = WorkflowRule.where('old_status_id = ? AND tracker_id = ? AND type = ?', issue.status_id, issue.tracker_id, WorkflowTransition).group(:role_id).pluck(:role_id)
-    target_roles = MemberRole.select { |role| workflow_rules.include?(role.role_id) }.map(&:member_id).sort
-    target_members = Member.select { |member| target_roles.include?(member.id) &&
-        member.project_id == current_project.id }.map(&:user_id).sort
+    target_roles = WorkflowRule.where('old_status_id = ? AND tracker_id = ? AND type = ? AND workspace_id = ?',
+                     issue.status_id, issue.tracker_id, WorkflowTransition, current_project.workspace_id).pluck(:role_id).uniq
+    User.select { |m| (m.roles_for_project(current_project).map(&:id) & target_roles).any? &&
+                       ! m.roles_for_project(current_project).detect(&:assignable).nil?}.uniq.sort
+  end
 
-    types = ['User']
-    types << 'Group' if Setting.issue_group_assignment?
-
-    users = current_project.member_principals.select { |m| types.include?(m.principal.type) &&
-        m.roles.detect(&:assignable) && target_members.include?(m.principal.id) }.map(&:principal).sort
-    users.uniq.sort
+  def reassign(issues)
+    users = nil
+    issues.uniq{|a| [a.status_id, a.project_id, a.tracker_id]}.each do |issue|
+      users = users.nil? ? assignable_users(issue) : users & assignable_users(issue)
+    end
+    users
   end
 end

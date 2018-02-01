@@ -29,6 +29,18 @@ class ViewsIssueHook < Redmine::Hook::Listener
     end
   end
 
+  def view_issues_context_menu_end(context)
+    if RedmineCustomViewAssigned.filtering_users == 'true'
+      users = helpers.reassign(context[:issues])
+      context[:controller].send(
+        :render_to_string, {
+          :partial => 'issues/context',
+          :layout => false,
+          :locals => {:@assignables => users}
+      })
+    end
+  end
+
   private
   def add_entry_to_group(groups, group_name, entry_id, entry_name)
     unless groups.has_key? group_name

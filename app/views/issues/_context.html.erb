@@ -1,0 +1,31 @@
+<% if @safe_attributes.include?('assigned_to_id') && @assignables.present? -%>
+<li id="issue_assigned_to_id_not_grouped" class="folder">
+  <a href="#" class="submenu"><%= l(:field_assigned_to) %></a>
+  <ul>
+  <% if @assignables.include?(User.current) %>
+      <li><%= context_menu_link "<< #{l(:label_me)} >>", bulk_update_issues_path(:ids => @issue_ids, :issue => {'assigned_to_id' => User.current}, :back_url => @back), :method => :post,
+                                :disabled => !@can[:edit] %></li>
+  <% end %>
+  <% @assignables.each do |u| -%>
+      <li><%= context_menu_link u.name, bulk_update_issues_path(:ids => @issue_ids, :issue => {'assigned_to_id' => u}, :back_url => @back), :method => :post,
+                                :selected => (@issue && u == @issue.assigned_to), :disabled => !@can[:edit] %></li>
+  <% end -%>
+      <li><%= context_menu_link l(:label_nobody), bulk_update_issues_path(:ids => @issue_ids, :issue => {'assigned_to_id' => 'none'}, :back_url => @back), :method => :post,
+                                :selected => (@issue && @issue.assigned_to.nil?), :disabled => !@can[:edit] %></li>
+  </ul>
+</li>
+<% end %>
+
+<script>
+  $(function () {
+    var atribsFrom=$(".folder[id='issue_assigned_to_id_not_grouped']").detach();
+    $(".folder a:contains('<%= l(:field_assigned_to) %>')").parent().remove();
+    if ( atribsFrom.length == '1' ) {
+      var atribsTo=$(".folder a:contains('<%= l(:field_priority) %>')").parent();
+      if ( atribsTo.length != '1' ) { atribsTo=$(".folder a:contains('<%= l(:field_tracker) %>')").parent() };
+      if ( atribsTo.length != '1' ) { atribsTo=$(".folder a:contains('<%= l(:field_status) %>')").parent() };
+      $(atribsTo).after(atribsFrom);
+    }
+  })
+</script>
+
