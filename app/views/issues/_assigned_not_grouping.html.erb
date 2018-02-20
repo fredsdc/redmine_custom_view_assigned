@@ -1,9 +1,7 @@
 <select id="issue_assigned_to_id_not_grouped" style="display: none;">
   <option value=""/>
-  <% users.each do |user| %>
-    <% if user.id == User.current.id %>
-      <option value="<%= User.current.id %>"><< <%= l(:label_me) %> >></option>
-    <% end %>
+  <% unless users.index{|x| x.id == User.current.id}.nil? %>
+    <option value="<%= User.current.id %>"><< <%= l(:label_me) %> >></option>
   <% end %>
   <% users.each do |user| %>
     <% if user.id != User.current.id %>
