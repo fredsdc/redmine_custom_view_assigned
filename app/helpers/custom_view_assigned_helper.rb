@@ -5,8 +5,7 @@ module CustomViewAssignedHelper
     target_roles = WorkflowRule.where('old_status_id = ? AND tracker_id = ? AND type = ? AND workspace_id = ?',
                      issue.status_id, issue.tracker_id, WorkflowTransition, current_project.workspace_id).pluck(:role_id).uniq
 
-    [ current_project.users_by_role.collect{|k, r| target_roles.include?(k.id) ? r : []},
-      target_roles.include?(3) ? User.active.visible.not_member_of(current_project) : [] ].flatten.uniq.sort_by{|u| u.name.downcase}
+    current_project.users_by_role.collect{|k, r| target_roles.include?(k.id) ? r : []}.flatten.uniq.sort_by{|u| u.name.downcase}
   end
 
   def reassign(issues)
