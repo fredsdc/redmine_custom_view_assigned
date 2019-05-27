@@ -1,4 +1,4 @@
-<%= select "issue_assigned_to_id", "not_grouped", principals_options_for_select(users, @issue.assigned_to), :include_blank => true, :required => @issue.required_attribute?('assigned_to_id') %>
+<%= select "issue_assigned_to_id", "not_grouped", principals_options_for_select(users, @issue.assigned_to), {:include_blank => true, :required => @issue.required_attribute?('assigned_to_id')}, {:style => 'visibility:hidden'} %>
 
 <script>
     //<![CDATA[
