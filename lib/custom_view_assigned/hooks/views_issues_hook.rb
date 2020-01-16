@@ -56,7 +56,7 @@ class ViewsIssueHook < Redmine::Hook::Listener
     label_no_group = l(:label_custom_view_assigned_no_group)
     add_entry_to_group(groups, label_no_group, User.current.id, "<< #{l(:label_me)} >>")
 
-    users.each do |user|
+    users.select{|x| x.type == "User"}.each do |user|
       if user.instance_of? Group
         add_entry_to_group(groups, h(l(:label_group_plural)), user.id, user.name)
       else
@@ -79,7 +79,7 @@ class ViewsIssueHook < Redmine::Hook::Listener
     add_entry_to_group(groups, l(:label_custom_view_assigned_current_user), User.current.id, "<< #{l(:label_me)} >>")
 
     Role.order(:position).each do |role|
-      users.each do |user|
+      users.select{|x| x.type == "User"}.each do |user|
         if user.roles_for_project(current_project).include? role
           add_entry_to_group(groups, role, user.id, user.name)
         end
