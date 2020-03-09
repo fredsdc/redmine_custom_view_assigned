@@ -8,7 +8,7 @@ module CustomViewAssignedHelper
 
     (Principal.active.joins(:members => :roles).
       where(:type => types, :members => {:project_id => issue.project_id}, :roles => {:id => target_roles, :assignable => true}).to_a |
-      (issue.new_record? ? [] : [Issue.find(issue.id).assigned_to])
+      (issue.new_record? || Issue.find(issue.id).assigned_to.nil? ? [] : [Issue.find(issue.id).assigned_to])
     ).uniq.sort_by{|p| p.name.downcase}
   end
 
